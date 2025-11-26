@@ -31,7 +31,7 @@ extends:
       - name: Prod
         dependsOn:
           - Training
-    serviceConnectionPrefix: Azure DevOps Pipelines - Inspector Programming - Infrastructure
+    serviceConnectionPrefix: Azure DevOps Pipelines - Appeals Decision Assistant - Infrastructure
     storageAccountName: pinssttfstateuksada
     resourceGroupName: pins-rg-shared-terraform-uks
     containerPrefix: terraform-state-scheduling-
