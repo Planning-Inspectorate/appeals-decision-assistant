@@ -1,0 +1,11 @@
+.idea
+node_modules
+
+# Local .terraform directories
+**/.terraform/*
+**/.terraform
+**/.terragrunt-cache
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
