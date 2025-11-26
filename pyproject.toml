@@ -1,0 +1,45 @@
+[project]
+name = "appeals-decision-assistant"
+version = "0.1.0"
+description = "Appeals Decision Assistant"
+requires-python = ">=3.13, <3.14"
+license = { file = "LICENSE" }
+
+[tool.uv]
+managed = true
+
+[tool.ruff]
+target-version = "py313"
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "E",   # standard python errors (pycodestyle)
+    "W",   # standard python warnings (pycodestyle)
+    "F",   # standard logic errors (pyflakes)
+    "I",   # import sorting
+    "PL",  # pylint
+    "R",   # refactoring
+    "UP",  # pyupgrade
+    "B",   # flake8 bugbear
+    "BLE", # bare exceptions
+    "C",   # complexity
+    "DTZ", # datetime errors
+    "G",   # logging format
+    "N",   # conform to PEP8 naming rules
+    "RET", # return values
+]
+
+ignore = [
+    "E501",    # line-too-long (Ruff formatter handles this, linter ignores it)
+    "PLW2901", # for loop variable overwritten by assignment target
+]
+
+dummy-variable-rgx = "_+|unused|.*_unused"
+
+[tool.ruff.format]
+# Black style
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
