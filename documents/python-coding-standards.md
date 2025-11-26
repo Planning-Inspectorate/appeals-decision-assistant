@@ -1,6 +1,6 @@
 # Python Coding Standards
 ## TL;DR
-* **Meaningful full-word identifiers** that are deterministic but concise; don't contract, remove, or use single letters
+* Use **meaningful full-word identifiers** that are deterministic but concise; don't contract, remove, or use single letters
 * **No global variables**; put constants in class or other scopes
 * Use **object-functional** programming, preferring pure functions
 * **Avoid shared state** if possible; pass it explicitly if necessary
