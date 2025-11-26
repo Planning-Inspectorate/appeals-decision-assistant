@@ -1,0 +1,14 @@
+{
+  "name": "appeals-decision-assistant",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "commitlint": "commitlint --from=$(git cherry origin/main | head -n 1 | cut -c 3-)",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@commitlint/cli": "^20.1.0",
+    "@commitlint/config-conventional": "^20.0.0"
+  }
+}
