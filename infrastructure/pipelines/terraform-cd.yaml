@@ -34,6 +34,6 @@ extends:
     serviceConnectionPrefix: Azure DevOps Pipelines - Appeals Decision Assistant - Infrastructure
     storageAccountName: pinssttfstateuksada
     resourceGroupName: pins-rg-shared-terraform-uks
-    containerPrefix: terraform-state-scheduling-
+    containerPrefix: terraform-state-appeals-decision-assistant-
     workingDirectory: $(Build.Repository.LocalPath)/infrastructure
     environmentVarFilePath: $(Build.Repository.LocalPath)/infrastructure/environments
