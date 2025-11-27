@@ -38,3 +38,19 @@ resource "azurerm_ai_foundry_project" "default" {
     type = "SystemAssigned"
   }
 }
+
+resource "azurerm_cognitive_deployment" "aifoundry_deployment_gpt_41" {
+  name                 = "${local.org}-gpt-41-${local.resource_suffix}"
+  cognitive_account_id = azurerm_ai_services.main.id
+
+  sku {
+    name     = "DataZoneStandard"
+    capacity = 1
+  }
+
+  model {
+    format  = "OpenAI"
+    name    = "gpt-4.1"
+    version = "2025-04-14"
+  }
+}
