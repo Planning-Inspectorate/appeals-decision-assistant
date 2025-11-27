@@ -40,17 +40,34 @@ resource "azurerm_ai_foundry_project" "default" {
 }
 
 resource "azurerm_cognitive_deployment" "aifoundry_deployment_gpt_41" {
-  name                 = "${local.org}-gpt-41-${local.resource_suffix}"
+  name                 = "${local.org}-llm-gpt-41-${local.resource_suffix}"
   cognitive_account_id = azurerm_ai_services.main.id
 
   sku {
     name     = "DataZoneStandard"
-    capacity = 1
+    capacity = 2000
   }
 
   model {
     format  = "OpenAI"
     name    = "gpt-4.1"
     version = "2025-04-14"
+  }
+}
+
+
+resource "azurerm_cognitive_deployment" "aifoundry_deployment_gpt_5_mini" {
+  name                 = "${local.org}-llm-gpt-5-mini-${local.resource_suffix}"
+  cognitive_account_id = azurerm_ai_services.main.id
+
+  sku {
+    name     = "DataZoneStandard"
+    capacity = 500
+  }
+
+  model {
+    format  = "OpenAI"
+    name    = "gpt-5-mini"
+    version = "2025-08-07"
   }
 }
