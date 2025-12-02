@@ -1,11 +1,27 @@
-.idea
+# Ignore all dotfiles and dot-directories, except the git ones
+.*
+!.git*
+
+# Node
 node_modules
 
-# Local .terraform directories
-**/.terraform/*
-**/.terraform
-**/.terragrunt-cache
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
 
-# .tfstate files
-*.tfstate
-*.tfstate.*
+# Coverage
+coverage.xml
+htmlcov/
+
+# OS / editor junk
+Thumbs.db
+*.swp
+*.swo
+*.tmp
+
+# Typical output files
+*.log
+*.err
+*.out
+*.tmp
