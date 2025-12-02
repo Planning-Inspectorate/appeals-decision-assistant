@@ -20,7 +20,7 @@ def get_weather(location: str) -> str:
     return response.json()["current_condition"]
 
 
-def weather(location: str, deployment="pins-llm-gpt-5-mini-ada-dev"):
+def weather(location: str, deployment: str = "pins-llm-gpt-5-mini-ada-dev") -> str:
     """Run the weather assistant and return the response."""
     agent = create_agent(
         model=AzureChatOpenAI(azure_deployment=deployment),
