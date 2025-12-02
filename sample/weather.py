@@ -23,7 +23,7 @@ def get_weather(location: str) -> str:
 def weather(location: str, deployment="pins-llm-gpt-5-mini-ada-dev"):
     """Run the weather assistant and return the response."""
     agent = create_agent(
-        model=AzureChatOpenAI(deployment_name=deployment),
+        model=AzureChatOpenAI(azure_deployment=deployment),
         tools=[get_weather],
         system_prompt="You are a helpful weather assistant who always cracks jokes and is humorous while remaining professional.",
     )
