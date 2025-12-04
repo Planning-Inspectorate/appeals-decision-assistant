@@ -13,7 +13,7 @@ from langchain_community.callbacks import get_openai_callback
 from langchain_openai import AzureChatOpenAI
 
 
-@tool(description="Get the weather in a location.")
+@tool
 def get_weather(location: str) -> str:
     """Get the weather in a location."""
     response = requests.get(f"https://wttr.in/{location}?format=j1", timeout=120)
