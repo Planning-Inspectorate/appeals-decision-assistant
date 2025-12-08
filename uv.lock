@@ -117,6 +117,7 @@ dependencies = [
     { name = "langchain-community" },
     { name = "langchain-text-splitters" },
     { name = "pymupdf" },
+    { name = "spire-pdf" },
     { name = "tiktoken" },
     { name = "unstructured" },
 ]
@@ -143,6 +144,7 @@ requires-dist = [
     { name = "langchain-community", specifier = ">=0.4.1" },
     { name = "langchain-text-splitters", specifier = ">=0.3.0" },
     { name = "pymupdf", specifier = ">=1.24.0" },
+    { name = "spire-pdf", specifier = ">=11.11.0" },
     { name = "tiktoken", specifier = ">=0.7.0" },
     { name = "unstructured", specifier = ">=0.18.21" },
 ]
@@ -1056,6 +1058,15 @@ wheels = [
 ]
 
 [[package]]
+name = "plum-dispatch"
+version = "1.7.4"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/39/4e/f4d6b2bd80a9880989d37773f0f2e3a91a2d5352732e4ebb68b5606bca83/plum-dispatch-1.7.4.tar.gz", hash = "sha256:1c1d15b2842b5fa98405fd3dff6fad4887bdc77b60bd200e209d76ebfe9990fe", size = 56429, upload-time = "2022-10-21T06:29:20.747Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e6/b6/3aaa985591c63da64c7bd8c5f470442a4c00b37ad3ed057f21de14174f83/plum_dispatch-1.7.4-py3-none-any.whl", hash = "sha256:c40dbeab269bbbf972ce0dbc078380da19ebaee1a370a2c564e1814a11bde216", size = 24238, upload-time = "2022-10-21T06:29:19.054Z" },
+]
+
+[[package]]
 name = "propcache"
 version = "0.4.1"
 source = { registry = "https://pypi.org/simple" }
@@ -1377,6 +1388,20 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/6d/e6/21ccce3262dd4889aa3332e5a119a3491a95e8f60939870a3a035aabac0d/soupsieve-2.8.tar.gz", hash = "sha256:e2dd4a40a628cb5f28f6d4b0db8800b8f581b65bb380b97de22ba5ca8d72572f", size = 103472, upload-time = "2025-08-27T15:39:51.78Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/14/a0/bb38d3b76b8cae341dad93a2dd83ab7462e6dbcdd84d43f54ee60a8dc167/soupsieve-2.8-py3-none-any.whl", hash = "sha256:0cc76456a30e20f5d7f2e14a98a4ae2ee4e5abdc7c5ea0aafe795f344bc7984c", size = 36679, upload-time = "2025-08-27T15:39:50.179Z" },
+]
+
+[[package]]
+name = "spire-pdf"
+version = "11.11.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "plum-dispatch" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d7/35/21a394e41bea1bbb1453e05f2eaf54d9cfac29a88d3ce0be364d48a91684/spire_pdf-11.11.0-py3-none-macosx_10_7_universal.whl", hash = "sha256:dcb147d574af971eabb3b199afb16dfcc97768900f4f0c44219cf6a4f4db5846", size = 52574248, upload-time = "2025-11-27T08:58:52.686Z" },
+    { url = "https://files.pythonhosted.org/packages/c8/c3/8273e9d1ceb4376738de0b36f356dccf5b10733fb734c4b608bfd24c6f51/spire_pdf-11.11.0-py3-none-manylinux2014_aarch64.whl", hash = "sha256:7a30053bb8495dad688270cd75bf9eea2df8ecddc4772e807beed2730ec2a851", size = 25540592, upload-time = "2025-11-27T08:58:59.955Z" },
+    { url = "https://files.pythonhosted.org/packages/2e/b0/0a0099e673ca9f292a336f89fd72c87978ef57555c20dee6da7b65228b99/spire_pdf-11.11.0-py3-none-manylinux_2_31_x86_64.whl", hash = "sha256:c24919855468c39a31bb41893e00b57748b7c9257567d74d6a01262e4502235b", size = 42400870, upload-time = "2025-11-27T08:59:09.8Z" },
+    { url = "https://files.pythonhosted.org/packages/59/27/4b9a6109c84d5e0160cb39f599a2aff72cb40ed80f4db80e58264005e114/spire_pdf-11.11.0-py3-none-win_amd64.whl", hash = "sha256:7f4c10715c058f970c6e55e471f6bc24eb479c331e0cbb44555e7ff55ef847cd", size = 28147013, upload-time = "2025-11-27T08:59:17.623Z" },
 ]
 
 [[package]]
