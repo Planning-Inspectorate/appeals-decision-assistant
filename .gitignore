@@ -20,7 +20,9 @@ Thumbs.db
 *.swo
 *.tmp
 
-# Typical output files
+# Typical input and output files
+*.pdf
+*.txt
 *.log
 *.err
 *.out
