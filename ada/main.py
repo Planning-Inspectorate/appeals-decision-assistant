@@ -163,8 +163,8 @@ def orchestrate(
 
 
 def main():
-    """Main entry point for the DeepAgent PDF review example."""
-    parser = ArgumentParser(description="DeepAgent PDF document review orchestrator", argument_default=SUPPRESS)
+    """Main entry point for the DeepAgent document review orchestrator."""
+    parser = ArgumentParser(description="DeepAgent document review orchestrator", argument_default=SUPPRESS)
     parser.add_argument("-l", "--logging", type=str, default="info", help="Logging level.")
     parser.add_argument("-d", "--deployment", type=str, help="Azure deployment name.")
     parser.add_argument("decision", type=Path, help="Path to the decision file to review.")
@@ -178,10 +178,10 @@ def main():
     try:
         with TemporaryDirectory(prefix="ada_scratch_") as directory:
             print(orchestrate(directory, keywords.pop("decision"), **keywords))
+        return 0
     except ValueError as exception:
         logging.error("%s", exception)
         return 1
-    return 0
 
 
 if __name__ == "__main__":
