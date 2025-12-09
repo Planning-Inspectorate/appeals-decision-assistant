@@ -3,5 +3,4 @@ description: Reviews document content for structure of sentences and paragraphs.
 system_prompt: 'You are a content quality specialist. Review and highlight where sentences
   and paragraphs are too long
 
-
   {manifest}'
