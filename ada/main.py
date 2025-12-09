@@ -5,10 +5,12 @@ import json
 import logging
 import sys
 from argparse import SUPPRESS, ArgumentParser
-from collections.abc import Iterator
+from collections.abc import Callable, Iterable, Iterator
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing import Any
 
+import yaml
 from deepagents import create_deep_agent  # type: ignore[import-untyped]
 from deepagents.backends import FilesystemBackend  # type: ignore[import-untyped]
 from langchain.chat_models import init_chat_model
@@ -87,6 +89,38 @@ def upload(kind: str, path: Path, backend: FilesystemBackend, token_limit: int, 
     )
 
 
+def load_agents(
+    defaults: dict[str, Any],
+    interpolate: dict[str, Any],
+    tools: Iterable[Callable] = (),
+    directory: str = "agents",
+) -> tuple[list[dict], str]:
+    """Load agents from yml files in `directory` with `defaults` applied.
+    The `interpolate` dictionary is used to interpolate any placeholders in the agent's system prompt.
+    If `tools` is provided, they are added to each agent's `tools` list for any agent that has uses the tool
+    Return a tuple of the list of agents and a description of the agents for use in the system prompt."""
+    tools_map = {tool.__name__: tool for tool in tools}
+
+    def load_agent(path: Path) -> dict | None:
+        with open(path) as stream:
+            agent = yaml.safe_load(stream)
+        if agent.pop("disabled", False):
+            return None
+        agent["system_prompt"] = agent["system_prompt"].format(**interpolate)
+        if "tools" in agent:
+            agent["tools"] = [tools_map[tool] for tool in agent["tools"]]
+        return {**defaults, **agent}
+
+    agents = [
+        agent
+        for path
+        in Path(directory).glob("*.yml")
+        if (agent := load_agent(path))
+    ]  # fmt: skip
+    descriptions = "\n".join([f"- {agent['name']}: {agent['description']}" for agent in agents])
+    return agents, descriptions
+
+
 def orchestrate(
     directory: str,
     decision: Path,
@@ -101,33 +135,11 @@ def orchestrate(
         # TODO: assemble other inputs
     )
     manifest = "\n".join(upload(kind, path, backend, token_limit, model_name) for kind, path in inputs)
-    logging.info("input manifest:\n%s", manifest)
-
     model = init_chat_model(f"azure_openai:{deployment}")
-    subagents = [
-        # TODO: the agents will move to yml files and be interpolated
-        {
-            "name": "structure-reviewer",
-            "description": "Reviews document content for structure of sentences and paragraphs.",
-            "system_prompt": (
-                "You are a content quality specialist. Review and highlight where sentences and paragraphs are too long\n\n"
-                f"{manifest}"
-            ),
-            "model": model,
-        },
-        {
-            "name": "spelling-reviewer",
-            "description": "Reviews document content in terms of spelling, grammar and punctuation.",
-            "system_prompt": (
-                "You are a content quality specialist. Review and highlight any errors in spelling, grammar, or punctuation.\n"
-                "Output only a list of errors to be corrected. Do not provide explanations or additional commentary.\n\n"
-                f"{manifest}"
-            ),
-            "model": model,
-        },
-    ]
-    subagents = [agent for agent in subagents if agent.get("enabled", True)]
-    subagent_descriptions = "\n".join([f"- {agent['name']}: {agent['description']}" for agent in subagents])
+    subagents, subagent_descriptions = load_agents(
+        defaults={"model": model},
+        interpolate={"manifest": manifest},
+    )
     prompt = deindent(f"""
         You are a document review orchestrator coordinating specialized review agents.
         Available subagents:
@@ -150,6 +162,7 @@ def orchestrate(
         Present the final output as a clean, organised list of improvements in a structured format only.
     """)
     logging.info("agent system prompt:\n%s", prompt)
+    logging.info("input manifest:\n%s", manifest)
     agent = create_deep_agent(model=model, system_prompt=prompt, backend=backend, subagents=subagents)
     with get_openai_callback() as usage:
         response = agent.invoke(

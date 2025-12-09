@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+from pathlib import Path
+
+from yaml import dump
 
 
 def deindent(text: str) -> str:
@@ -22,3 +25,10 @@ def deindent(text: str) -> str:
             prefix = first[:index]
             text = "\n".join(line.removeprefix(prefix) for line in lines)
     return text
+
+
+def output(agents):
+    for agent in agents:
+        del agent["model"]
+        with open(Path("agents") / (agent["name"] + ".yml"), "w") as stream:
+            dump(agent, stream, sort_keys=False)
