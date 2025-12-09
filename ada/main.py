@@ -94,11 +94,11 @@ def load_agents(
     interpolate: dict[str, Any],
     tools: Iterable[Callable] = (),
     directory: str = "agents",
-) -> tuple[list[dict], str]:
+) -> list[dict]:
     """Load agents from yml files in `directory` with `defaults` applied.
     The `interpolate` dictionary is used to interpolate any placeholders in the agent's system prompt.
     If `tools` is provided, they are added to each agent's `tools` list for any agent that has uses the tool
-    Return a tuple of the list of agents and a description of the agents for use in the system prompt."""
+    Return a list of agents."""
     tools_map = {tool.__name__: tool for tool in tools}
 
     def load_agent(path: Path) -> dict | None:
@@ -111,14 +111,12 @@ def load_agents(
             agent["tools"] = [tools_map[tool] for tool in agent["tools"]]
         return {**defaults, **agent}
 
-    agents = [
+    return [
         agent
         for path
         in Path(directory).glob("*.yml")
         if (agent := load_agent(path))
     ]  # fmt: skip
-    descriptions = "\n".join([f"- {agent['name']}: {agent['description']}" for agent in agents])
-    return agents, descriptions
 
 
 def orchestrate(
@@ -136,10 +134,8 @@ def orchestrate(
     )
     manifest = "\n".join(upload(kind, path, backend, token_limit, model_name) for kind, path in inputs)
     model = init_chat_model(f"azure_openai:{deployment}")
-    subagents, subagent_descriptions = load_agents(
-        defaults={"model": model},
-        interpolate={"manifest": manifest},
-    )
+    subagents = load_agents(defaults={"model": model}, interpolate={"manifest": manifest})
+    subagent_descriptions = "\n".join([f"- {agent['name']}: {agent['description']}" for agent in subagents])
     prompt = deindent(f"""
         You are a document review orchestrator coordinating specialized review agents.
         Available subagents:
