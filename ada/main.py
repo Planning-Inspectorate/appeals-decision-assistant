@@ -18,6 +18,8 @@ from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from tiktoken import encoding_for_model, get_encoding
 
+from ada.utility import deindent
+
 
 def count_tokens(text: str, model: str) -> int:
     """Return count of tokens in text."""
@@ -126,24 +128,29 @@ def orchestrate(
     ]
     subagents = [agent for agent in subagents if agent.get("enabled", True)]
     subagent_descriptions = "\n".join([f"- {agent['name']}: {agent['description']}" for agent in subagents])
-    agent = create_deep_agent(
-        model=model,
-        system_prompt=(
-            "You are a document review orchestrator coordinating specialized review agents.\n\n"
-            f"Available subagents:\n{subagent_descriptions}\n"
-            "Delegate review tasks to all appropriate subagents. They have file tools to read the document. "
-            "Each subagent will provide its list of suggestions for the document "
-            "You should aggregate all suggestions into a comprehensive list of improvements. "
-            "Do not provide any additional commentary or explanations beyond the aggregated list. "
-            "Do not explain about the process or make reference to any of the subagents. "
-            "Do not produce a new version of the docuemnt. "
-            "Do not offer to do anything else or make any suggestions about further actions. "
-            "Present the final output as a clean, organised list of improvements in a structured format only."
-        ),
-        backend=backend,
-        subagents=subagents,
-    )
-
+    prompt = deindent(f"""
+        You are a document review orchestrator coordinating specialized review agents.
+        Available subagents:
+        {subagent_descriptions}
+        Delegate review tasks to all appropriate subagents. They have file tools to read the document.
+        Instruct each subagent to provide its output as a JSON list of suggestions.
+        The following format should be used for each suggestion:
+        {{
+            "type": "<category of issue>",
+            "location": "<line number range>",
+            "problem": "<brief description of the issue>",
+            "original": "<snippet of the original text>",
+            "suggested": "<either the suggested corrected verison, or a description of the correction to make>"
+        }}
+        You should aggregate all suggestions into a comprehensive list of improvements.
+        Do not provide any additional commentary or explanations beyond the aggregated list.
+        Do not explain about the process or make reference to any of the subagents.
+        Do not produce a new version of the docuemnt.
+        Do not offer to do anything else or make any suggestions about further actions.
+        Present the final output as a clean, organised list of improvements in a structured format only.
+    """)
+    logging.info("agent system prompt:\n%s", prompt)
+    agent = create_deep_agent(model=model, system_prompt=prompt, backend=backend, subagents=subagents)
     with get_openai_callback() as usage:
         response = agent.invoke(
             {
