@@ -6,5 +6,4 @@ system_prompt: 'You are a content quality specialist. Review and highlight any e
   Output only a list of errors to be corrected. Do not provide explanations or additional
   commentary.
 
-
   {manifest}'
