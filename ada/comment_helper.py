@@ -16,12 +16,16 @@ class CommentHelper:
 
     @staticmethod
     def extract_line_numbers(text: str) -> list[int]:
-        """Extract line numbers from comment text like 'Lines 9-11' or 'line 53'."""
+        """Extract line numbers from comment text like 'Lines 9-11' or 'line 53'.
+
+        Handles various dash types: hyphen (-), en-dash (–), em-dash (—).
+        """
         line_numbers = []
-        # Match patterns like "Lines 9-11", "line 53", "Lines 106-108"
+        # Match patterns like "Lines 9-11", "Lines 9–11", "line 53", "Lines 106-108"
+        # [\-–—] matches hyphen, en-dash, or em-dash
         patterns = [
-            r'[Ll]ines?\s+(\d+)-(\d+)',  # Lines 9-11
-            r'[Ll]ines?\s+(\d+)',          # line 53
+            r'[Ll]ines?\s+(\d+)[\-–—](\d+)',  # Lines 9-11 or Lines 9–11
+            r'[Ll]ines?\s+(\d+)',              # line 53
         ]
 
         for pattern in patterns:
@@ -122,7 +126,49 @@ class CommentHelper:
     @staticmethod
     def add_comments_to_docx(docx_path: Path, comments_text: str, output_path: Path) -> None:
         """Add LLM improvement suggestions as comments on the Word document."""
+        from langchain_community.document_loaders import UnstructuredWordDocumentLoader
+
         doc = Document(str(docx_path))
+
+        # Load the document the same way the LLM saw it
+        loader = UnstructuredWordDocumentLoader(str(docx_path))
+        extracted_text = loader.load()[0].page_content
+        extracted_lines = extracted_text.split("\n")
+
+        # Build a mapping from extracted line numbers to paragraph indices
+        # by matching text content. Track which paragraphs we've already used
+        # to handle duplicate text correctly.
+        line_to_para_map = {}
+        used_paragraphs = set()
+
+        for line_idx, line in enumerate(extracted_lines, start=1):
+            line_text = line.strip()
+            if not line_text:  # Skip empty lines
+                continue
+
+            # Find matching paragraph that hasn't been used yet
+            for para_idx, paragraph in enumerate(doc.paragraphs):
+                if para_idx in used_paragraphs:
+                    continue
+
+                para_text = paragraph.text.strip()
+                if not para_text:
+                    continue
+
+                # Try exact match first
+                if para_text == line_text:
+                    line_to_para_map[line_idx] = para_idx
+                    used_paragraphs.add(para_idx)
+                    break
+
+                # Fall back to fuzzy match for texts that are very similar
+                # (handles minor whitespace or formatting differences)
+                normalized_para = " ".join(para_text.split())
+                normalized_line = " ".join(line_text.split())
+                if normalized_para == normalized_line:
+                    line_to_para_map[line_idx] = para_idx
+                    used_paragraphs.add(para_idx)
+                    break
 
         comment_sections = CommentHelper._parse_comment_sections(comments_text)
 
@@ -134,9 +180,10 @@ class CommentHelper:
                 continue
 
             for line_num in line_numbers:
-                para_idx = line_num - 1
+                # Map the extracted line number to the actual paragraph index
+                para_idx = line_to_para_map.get(line_num)
 
-                if 0 <= para_idx < len(doc.paragraphs):
+                if para_idx is not None and 0 <= para_idx < len(doc.paragraphs):
                     paragraph = doc.paragraphs[para_idx]
 
                     if paragraph.runs:
