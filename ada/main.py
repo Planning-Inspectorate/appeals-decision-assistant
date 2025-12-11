@@ -15,13 +15,14 @@ from deepagents import create_deep_agent  # type: ignore[import-untyped]
 from deepagents.backends import FilesystemBackend  # type: ignore[import-untyped]
 from langchain.chat_models import init_chat_model
 from langchain_community.callbacks import get_openai_callback
-from langchain_community.document_loaders import PyMuPDFLoader
+from langchain_community.document_loaders import PyMuPDFLoader, UnstructuredWordDocumentLoader
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from tiktoken import encoding_for_model, get_encoding
 
 from ada.utility import deindent
 
+from comment_helper import CommentHelper
 
 def count_tokens(text: str, model: str) -> int:
     """Return count of tokens in text."""
@@ -39,6 +40,8 @@ def read_text_pages(path: Path, kind: str | None = None) -> list[Document]:
     """Load document according to extension (or explicitly provied) kind and return pages."""
     loaders = {
         ".pdf": PyMuPDFLoader,
+        ".docx": UnstructuredWordDocumentLoader,
+        ".doc": UnstructuredWordDocumentLoader,
     }
     loader = loaders[kind or path.suffix.lower()]
     return loader(path).load()
@@ -192,8 +195,24 @@ def main():
     )
 
     try:
+        decision_path = keywords.pop("decision")
         with TemporaryDirectory(prefix="ada_scratch_") as directory:
-            print(orchestrate(directory, keywords.pop("decision"), **keywords))
+            improvements = orchestrate(directory, decision_path, **keywords)
+            print(improvements)
+
+            # Determine file type and add comments accordingly
+            output_path = decision_path.parent / f"{decision_path.stem}_reviewed{decision_path.suffix}"
+            file_extension = decision_path.suffix.lower()
+
+            if file_extension == ".pdf":
+                CommentHelper.add_comments_to_pdf(decision_path, improvements, output_path)
+                logging.info("Annotated PDF saved to: %s", output_path)
+            elif file_extension in [".docx", ".doc"]:
+                CommentHelper.add_comments_to_docx(decision_path, improvements, output_path)
+                logging.info("Annotated Word document saved to: %s", output_path)
+            else:
+                logging.warning("Unsupported file format: %s. Skipping annotation.", file_extension)
+
         return 0
     except ValueError as exception:
         logging.error("%s", exception)
