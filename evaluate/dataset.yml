@@ -1,0 +1,6 @@
+name: "test-dataset"
+examples:
+  - inputs:
+      path: "~/Downloads/Appeal-Decision=6000640.pdf"
+    outputs:
+      review_output: "Ada orchestrator completed successfully"
