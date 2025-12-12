@@ -155,6 +155,7 @@ def orchestrate(
         Do not explain about the process or make reference to any of the subagents.
         Do not produce a new version of the docuemnt.
         Do not offer to do anything else or make any suggestions about further actions.
+        Only use the subagents provided.
         Present the final output as a clean, organised list of improvements in a structured format only.
     """)
     logging.info("agent system prompt:\n%s", prompt)
@@ -193,8 +194,7 @@ def main():
 
     try:
         with TemporaryDirectory(prefix="ada_scratch_") as directory:
-            print(orchestrate(directory, keywords.pop("decision"), **keywords))
-        return 0
+            return orchestrate(directory, keywords.pop("decision"), **keywords)
     except ValueError as exception:
         logging.error("%s", exception)
         return 1

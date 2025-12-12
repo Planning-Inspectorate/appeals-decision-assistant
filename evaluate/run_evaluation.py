@@ -43,10 +43,8 @@ def ada_orchestrator(user_message_dict: dict) -> dict:
         ]
 
         # Run ada.main() which will handle the document review
-        ada_main()
+        return {"review_output": ada_main()}
 
-        # Return the result as a dictionary
-        return {"review_output": "Ada orchestrator completed successfully"}
     finally:
         # Restore original argv
         sys.argv = original_argv

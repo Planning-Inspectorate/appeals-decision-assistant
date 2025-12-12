@@ -1,6 +1,13 @@
 name: "test-dataset"
+description: "A dataset for testing the Ada orchestrator on appeal decision PDFs."
 examples:
   - inputs:
       path: "~/Downloads/Appeal-Decision=6000640.pdf"
     outputs:
-      review_output: "Ada orchestrator completed successfully"
+      review_output:
+      - "type": "Header formatting / fragmented words"
+        "location": "1-12"
+        "problem": "Header lines and words are fragmented across multiple lines (broken words, missing letters) which disrupts readability and structure."
+        "original": "Appeal \nDecision  \nSite visit made \non 14 October \n2025  \nby R Dickson \nBSc (Hons) \nMSc MRTPI  \nn Inspector appointed \ny the Secretary of \ntate   \necision date:"
+        "suggested": "Consolidate and correct header into a single coherent block. For example: \"Appeal Decision\nSite visit made on 14 October 2025 by R Dickson BSc (Hons) MSc MRTPI\nAn Inspector appointed by the Secretary of State\nDecision date: [insert date]\""
+      

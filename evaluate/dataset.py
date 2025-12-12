@@ -100,7 +100,7 @@ def create_sample_dataset(client: Client):
     # Load configuration from YAML
     config = load_dataset_config()
     dataset_name = config.get("name", "test-dataset")
-    description = "A sample dataset to test spelling corrections in LangSmith."
+    description = config.get("description", "Dataset for Ada orchestrator evaluations.")
 
     logging.info("create_sample_dataset: starting (dataset_name=%s)", dataset_name)
 
