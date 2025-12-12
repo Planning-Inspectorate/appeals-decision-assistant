@@ -10,7 +10,7 @@ from langsmith.schemas import ExperimentResults
 
 from ada.main import main as ada_main
 from evaluate.dataset import create_sample_dataset, get_dataset_name
-from evaluate.evaluators import correctness_evaluator
+from evaluate.evaluators import conciseness_evaluator, correctness_evaluator
 
 # Configure logging for the module
 logging.basicConfig(
@@ -57,7 +57,7 @@ def main(client: Client) -> ExperimentResults | ComparativeExperimentResults:
     return client.evaluate(
         ada_orchestrator,
         data=dataset_name,
-        evaluators=[correctness_evaluator],
+        evaluators=[correctness_evaluator, conciseness_evaluator],
         experiment_prefix="spellcheck-eval",
         max_concurrency=2,
     )
