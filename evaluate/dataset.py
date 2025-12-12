@@ -47,20 +47,39 @@ def load_examples_from_yaml() -> list:
 
 
 def create_missing_examples(client: Client, dataset_name: str, examples: list, existing_examples: list) -> int:
-    """Create examples that don't already exist in the dataset."""
+    """Create examples that don't already exist in the dataset, and update outputs if they differ."""
     examples_to_create = []
+    examples_to_update = []
+
     for example in examples:
-        example_exists = any(
-            ex.inputs == example["inputs"] for ex in existing_examples
-        )
-        if not example_exists:
+        # Find matching example by inputs
+        matching_example = None
+        for ex in existing_examples:
+            if ex.inputs == example["inputs"]:
+                matching_example = ex
+                break
+
+        if matching_example is None:
+            # Example doesn't exist, add to create list
             examples_to_create.append(example)
+        elif matching_example.outputs != example.get("outputs"):
+            # Example exists, check if outputs match
+            examples_to_update.append((matching_example, example))
+            logging.info("Example with inputs %s has differing outputs, will update", example["inputs"])
 
     if examples_to_create:
         client.create_examples(dataset_name=dataset_name, examples=examples_to_create)
         logging.info("Successfully created %d example(s) in dataset %s", len(examples_to_create), dataset_name)
     else:
         logging.info("All examples already exist in dataset %s", dataset_name)
+
+    if examples_to_update:
+        for existing_ex, example in examples_to_update:
+            client.update_example(
+                example_id=getattr(existing_ex, "id", None),
+                outputs=example.get("outputs")
+            )
+        logging.info("Successfully updated %d example(s) in dataset %s", len(examples_to_update), dataset_name)
 
     return len(examples_to_create)
 
